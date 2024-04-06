@@ -353,12 +353,53 @@ public static class LegalMoves
                 }
             }
         }
+        result.AddRange(KingCastleMoves(pos , board));
 
         var invalidPositionsName = invalidPositions.Select(p => p.Name);
 
         return result.ExceptBy(invalidPositionsName, x => x.Name).ToList();
     }
 
+    public static List<Position> KingCastleMoves(Position pos, Board board)
+    {
+        if (board.Pieces[pos.Index] is null) throw new Exception("empty position");
+        if (board.Pieces[pos.Index].Type is not PieceType.King) throw new Exception("pieceType isn't matched.");
+
+        var color = board.Pieces[pos.Index].Color;
+        var oppositeColor = color is PieceColor.Black ? PieceColor.White : PieceColor.Black;
+
+        var result = new List<Position>();
+
+        if (board.Situations[color].IsKingMoved) return new List<Position>();
+
+        var betweenARookAndKing = new List<Position>() { pos[pos.Row,3] , pos[pos.Row, 2] , pos[pos.Row,1] };
+        var betweenHRookAndKing = new List<Position>() { pos[pos.Row,5], pos[pos.Row,6] };
+
+        if (!board.Situations[color].IsARookMoved)
+        {
+            if (betweenARookAndKing.Select(x => board.Pieces[x.Index] is null).All(x => x))
+            {
+                var threat = Threat.Threats(board, oppositeColor);
+                if (!betweenARookAndKing.Take(2).Select(x => threat.Any(i => i.Index == x.Index)).Contains(true))
+                {
+                    result.Add(betweenARookAndKing[1]);
+                }
+            }
+        }
+        if (!board.Situations[color].IsHRookMoved)
+        {
+            if (betweenHRookAndKing.Select(x => board.Pieces[x.Index] is null).All(x => x))
+            {
+                var threat = Threat.Threats(board, oppositeColor);
+                if (!betweenHRookAndKing.Take(2).Select(x => threat.Any(i => i.Index == x.Index)).Contains(true))
+                {
+                    result.Add(betweenHRookAndKing[1]);
+                }
+            }
+        }
+        return result;
+    }
+    
     public static Board ApplyMove(Position previousPos, Position currentPos, Board board)
     {
         if (board.Pieces[previousPos.Index] is null) throw new ArgumentNullException();
@@ -377,6 +418,25 @@ public static class LegalMoves
                 {
                     newBoard.Pieces[Position.Move(currentPos, 1, 0).Index] = null;
                 }
+            }
+        }
+
+        if (piece.Type == PieceType.King)
+        {
+            if (KingCastleMoves(previousPos, board).Any(x => x.Index == currentPos.Index))
+            {
+                var pos = new Position();
+                var RookPreAndCurPos = currentPos.Name switch
+                {
+                    "c1" => (pos["a1"], pos["d1"]),
+                    "g1" => (pos["h1"], pos["f1"]),
+                    "c8" => (pos["a8"], pos["d8"]),
+                    "g8" => (pos["h8"], pos["f8"]),
+                    _ => throw new ArgumentException()
+                };
+                var rook = (Piece)newBoard.Pieces[RookPreAndCurPos.Item1.Index].Clone();
+                newBoard.Pieces[RookPreAndCurPos.Item1.Index] = null;
+                newBoard.Pieces[RookPreAndCurPos.Item2.Index] = rook;
             }
         }
 
