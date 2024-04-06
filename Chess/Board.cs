@@ -116,6 +116,7 @@ public class Board : ICloneable
             WhiteSituation.IsHRookMoved = Moves.Any(x => x.Piece.Type == PieceType.Rook && x.Piece.Color == PieceColor.White && x.PreviousPos.Name == "h1");
             BlackSituation.IsChecked = Moves.Last().Check;
             BlackSituation.IsCheckMated = Moves.Last().CheckMate;
+            WhiteSituation.IsChecked = false;
             return;
         }
         
@@ -124,6 +125,7 @@ public class Board : ICloneable
         BlackSituation.IsHRookMoved = Moves.Any(x => x.Piece.Type == PieceType.Rook && x.Piece.Color == PieceColor.Black && x.PreviousPos.Name == "h8");
         WhiteSituation.IsChecked = Moves.Last().Check;
         WhiteSituation.IsCheckMated = Moves.Last().CheckMate;
+        BlackSituation.IsChecked = false;
     }
     
     public object Clone()
