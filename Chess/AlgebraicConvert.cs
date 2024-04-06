@@ -134,23 +134,27 @@ public static class AlgebraicConvert
             throw new Exception("not valid move");
         }
 
-        if (possiblePos.Count > 1)
+        if (piece.Type != PieceType.Pawn)
         {
-            if (possiblePos.Count(x => x.Column == p1.Column) == 0)
+            if (possiblePos.Count > 1)
             {
-                throw new Exception("not valid move");
-            }
-            if (possiblePos.Count(x => x.Column == p1.Column) == 1)
-            {
-                str += p1.Name[0];
-            }
-            else if (possiblePos.Count(x => x.Row == p1.Row) == 1)
-            {
-                str += p1.Name[1];
-            }
-            else
-            {
-                str += p1.Name;
+                if (possiblePos.Count(x => x.Column == p1.Column) == 0)
+                {
+                    throw new Exception("not valid move");
+                }
+
+                if (possiblePos.Count(x => x.Column == p1.Column) == 1)
+                {
+                    str += p1.Name[0];
+                }
+                else if (possiblePos.Count(x => x.Row == p1.Row) == 1)
+                {
+                    str += p1.Name[1];
+                }
+                else
+                {
+                    str += p1.Name;
+                }
             }
         }
 

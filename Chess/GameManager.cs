@@ -144,6 +144,7 @@ public class GameManager
                     ConsoleKey.RightArrow => Position.Move(pos, 0, 1 * sign),
                     _ => pos
                 };
+                Console.Beep(800, 50);
             }
             catch { }
 
@@ -179,6 +180,7 @@ public class GameManager
                     ConsoleKey.RightArrow => Position.Move(pos, 0, 1 * sign),
                     _ => pos
                 };
+                Console.Beep(800, 50);
             }
             catch { }
 

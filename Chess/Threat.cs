@@ -60,14 +60,10 @@ public static class Threat
         };
         var pos = new Position();
         var kingPos = pos[board.Pieces.ToList().FindIndex(predicate)];
-        var kingMoves = LegalMoves.KingMoves(kingPos, board);
-        var oppositeColor = color is PieceColor.Black ? PieceColor.White : PieceColor.Black;
-        var threats = Threats(board, oppositeColor);
-        foreach (var kingMove in kingMoves)
-        {
-            if (threats.Any(x => x.Index == kingMove.Index)) continue;
-            return false;
-        }
+        var kingMoves = LegalMoves.LegalMoveList(kingPos, board);
+
+        if (kingMoves.Count > 0) return false;
+
         var canEscapeCheckWithOtherPiece = board.Pieces
             .ToList()
             .Select((x, index) => (x, index))
