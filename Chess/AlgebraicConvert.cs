@@ -7,24 +7,62 @@ public static class AlgebraicConvert
     public static Move AlgebraicToMove(string str, Board board, PieceColor color)
     {
         var algebraic = str;
+        Piece piece = new Piece();
+        piece.Color = color;
+        var oppositeColor = color is PieceColor.Black ? PieceColor.White : PieceColor.Black;
+        var result = new Move();
+
+        Predicate<Piece?> match = x =>
+        {
+            if (x is null) return false;
+            return x.Color == color && x.Type == PieceType.King;
+        };
         if (str == "O-O")
         {
-            return new Move();
+            var kingIndex = board.Pieces.ToList().FindIndex(match);
+            var tempPos = new Position();
+            if (LegalMoves.KingCastleMoves(tempPos[kingIndex], board).Count > 0)
+            {
+                var castleMoves = LegalMoves.KingCastleMovesTuple(tempPos[kingIndex], board);
+                if (castleMoves.Short is not null)
+                {
+                    result.Piece = new Piece { Color = color, Type = PieceType.King };
+                    result.PreviousPos = tempPos[kingIndex];
+                    result.CurrentPos = castleMoves.Short;
+                    var applyCastleMove = LegalMoves.ApplyMove(result.PreviousPos, result.CurrentPos, board);
+                    result.Check = Threat.IsChecked(applyCastleMove, oppositeColor);
+                    result.CheckMate = result.Check ? Threat.IsCheckMated(applyCastleMove, oppositeColor) : false;
+                    result.Capture = false;
+                    result.Algebraic = "O-O";
+                    return result;
+                }
+            }
         }
 
         if (str == "O-O-O")
         {
-            return new Move();
+            var kingIndex = board.Pieces.ToList().FindIndex(match);
+            var tempPos = new Position();
+            if (LegalMoves.KingCastleMoves(tempPos[kingIndex], board).Count > 0)
+            {
+                var castleMoves = LegalMoves.KingCastleMovesTuple(tempPos[kingIndex], board);
+                if (castleMoves.Long is not null)
+                {
+                    result.Piece = new Piece { Color = color, Type = PieceType.King };
+                    result.PreviousPos = tempPos[kingIndex];
+                    result.CurrentPos = castleMoves.Long;
+                    var applyCastleMove = LegalMoves.ApplyMove(result.PreviousPos, result.CurrentPos, board);
+                    result.Check = Threat.IsChecked(applyCastleMove, oppositeColor);
+                    result.CheckMate = result.Check ? Threat.IsCheckMated(applyCastleMove, oppositeColor) : false;
+                    result.Capture = false;
+                    result.Algebraic = "O-O-O";
+                    return result;
+                }
+            }
         }
-
-        var result = new Move();
 
         str = new string(str.Where(x => x != '+' && x != '#' && x != 'x').ToArray());
         string str1 = str;
-
-        Piece piece = new Piece();
-        piece.Color = color;
-        var oppositeColor = color is PieceColor.Black ? PieceColor.White : PieceColor.Black;
 
         if (char.IsUpper(str[0]))
         {
@@ -132,6 +170,31 @@ public static class AlgebraicConvert
         if (possiblePos.Count == 0)
         {
             throw new Exception("not valid move");
+        }
+
+        if (piece.Type == PieceType.King)
+        {
+            if (LegalMoves.KingCastleMoves(p1, board).Count > 0)
+            {
+                var castleMoves = LegalMoves.KingCastleMovesTuple(p1, board);
+                if (castleMoves.Long is not null)
+                {
+                    if (p2.Index == castleMoves.Long.Index)
+                    {
+                        str = "O-O-O";
+                        return str;
+                    }
+                }
+
+                if (castleMoves.Short is not null)
+                {
+                    if (p2.Index == castleMoves.Short.Index)
+                    {
+                        str = "O-O";
+                        return str;
+                    }
+                }
+            }
         }
 
         if (piece.Type != PieceType.Pawn)

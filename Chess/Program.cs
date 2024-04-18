@@ -10,7 +10,7 @@ public class Program
         Console.WriteLine("FullScreen first and then press any key");
         Console.ReadKey();
         Console.Clear();
-        var game = new GameManager("Mahdi" , "Ali");
+        var game = new GameManager();
         game.FlipBoardEachMove = true;
         game.HowToPlay = GameManager.PlayMethod.ArrowKey;
         game.StartAutoPlay();

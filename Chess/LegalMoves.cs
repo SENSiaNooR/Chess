@@ -399,7 +399,14 @@ public static class LegalMoves
         }
         return result;
     }
-    
+
+    public static (Position? Short, Position? Long) KingCastleMovesTuple(Position pos, Board board)
+    {
+        var positions = KingCastleMoves(pos, board);
+        var shortCastle = positions.FirstOrDefault(x => x.Column - pos.Column > 0 , null);
+        var longCastle = positions.FirstOrDefault(x => x.Column - pos.Column < 0, null);
+        return (shortCastle, longCastle);
+    }
     public static Board ApplyMove(Position previousPos, Position currentPos, Board board)
     {
         if (board.Pieces[previousPos.Index] is null) throw new ArgumentNullException();
