@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ public class DisplayBoard
     public bool DisplayMovesList { get; set; } = true;
     public bool ShowNotation { get; set; } = true;
     public bool FlipBoard { get; set; } = false;
+    public TypoGraph HowToDisplayPieces = TypoGraph.Alpha;
 
     public List<Position> HighLight1Positions { get; set; } = new List<Position>();
     public Position? HighLight2Position { get; set; } = null;
@@ -29,6 +31,32 @@ public class DisplayBoard
         TopLeft,
         Center
     }
+
+    public enum TypoGraph
+    {
+        Alpha,
+        Symbol
+    }
+
+    private Dictionary<PieceType, char> _alpha = new()
+    {
+        {PieceType.Bishop , 'B'},
+        {PieceType.King , 'K'},
+        {PieceType.Knight , 'N'},
+        {PieceType.Pawn , 'P'},
+        {PieceType.Queen , 'Q'},
+        {PieceType.Rook , 'R'}
+    };
+
+    private Dictionary<PieceType, char> _symbol = new()
+    {
+        {PieceType.Bishop , '\u2657'},
+        {PieceType.King , '\u2654'},
+        {PieceType.Knight , '\u2658'},
+        {PieceType.Pawn , '\u2659'},
+        {PieceType.Queen , '\u2655'},
+        {PieceType.Rook , '\u2656'}
+    };
 
     public Align CharAlign { get; set; } = Align.Center;
 
@@ -62,15 +90,7 @@ public class DisplayBoard
 
             if (board.Pieces[i] is not null)
             {
-                c = board.Pieces[i].Type switch
-                {
-                    PieceType.Bishop => 'B',
-                    PieceType.King => 'K',
-                    PieceType.Knight => 'N',
-                    PieceType.Pawn => 'P',
-                    PieceType.Queen => 'Q',
-                    PieceType.Rook => 'R'
-                };
+                c = (HowToDisplayPieces == TypoGraph.Alpha) ? _alpha[board.Pieces[i].Type] : _symbol[board.Pieces[i].Type];
                 forColor = board.Pieces[i].Color is PieceColor.White ? WhiteColor : BlackColor;
                 check = (c == 'K' && board.Situations[board.Pieces[i].Color].IsChecked);
             }

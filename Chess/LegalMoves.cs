@@ -372,7 +372,7 @@ public static class LegalMoves
 
         if (board.Situations[color].IsKingMoved) return new List<Position>();
 
-        var betweenARookAndKing = new List<Position>() { pos[pos.Row,3] , pos[pos.Row, 2] , pos[pos.Row,1] };
+        var betweenARookAndKing = new List<Position>() { pos[pos.Row,3] , pos[pos.Row,2] , pos[pos.Row,1] };
         var betweenHRookAndKing = new List<Position>() { pos[pos.Row,5], pos[pos.Row,6] };
 
         if (!board.Situations[color].IsARookMoved)
@@ -407,6 +407,7 @@ public static class LegalMoves
         var longCastle = positions.FirstOrDefault(x => x.Column - pos.Column < 0, null);
         return (shortCastle, longCastle);
     }
+    
     public static Board ApplyMove(Position previousPos, Position currentPos, Board board)
     {
         if (board.Pieces[previousPos.Index] is null) throw new ArgumentNullException();
